@@ -2,7 +2,9 @@ package com.example.huyviet1995.criminalintent;
 
 import android.text.format.DateFormat;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -21,12 +23,11 @@ public class Crime {
         mDate = new Date();
     }
 
-    public CharSequence getDate() {
-        CharSequence sequence = DateFormat.format("EEEE, MMM dd, yyyy.", mDate.getTime());
-        return sequence;
+    public Date getDate() {
+        return mDate;
     }
 
-    public void setDate(Date date) {mDate = date;}
+    public void setDate(Date date)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 {mDate = date;}
 
 
     public UUID getID() {
@@ -44,4 +45,9 @@ public class Crime {
     public void setSolved(boolean solved) {
         this.mSolved = solved;
     }
+    public boolean isSolved() {
+        return mSolved;
+    }
+
+    
 }
