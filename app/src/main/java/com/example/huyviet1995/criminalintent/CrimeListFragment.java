@@ -12,8 +12,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import org.w3c.dom.Text;
+
 import java.util.Date;
 import java.util.List;
 
@@ -25,6 +30,10 @@ public class CrimeListFragment extends Fragment {
     private CrimeAdapter mAdapter;
     private boolean mSubtitleVisible;
     private static final String SAVED_SUBTITLE_VISIBLE = "subtitle";
+    private TextView noCrimeMessage;
+    private LinearLayout noCrimeView;
+    private Button mAddButton;
+
     @Override
     public void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,11 +43,16 @@ public class CrimeListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_crime_list, container, false);
-
+        noCrimeMessage = (TextView)view.findViewById(R.id.no_crime_display);
         mCrimeRecycleView = (RecyclerView) view.findViewById(R.id.crime_recycle_view);
         mCrimeRecycleView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        if (savedInstanceState == null) {
-           // mSubtitleVisible = savedInstanceState.getBoolean(SAVED_SUBTITLE_VISIBLE);
+        /*Challenge 3: Add a view holder with text and a button*/
+        noCrimeView = (LinearLayout)view.findViewById(R.id.no_crime_view);
+        noCrimeMessage = (TextView) view.findViewById(R.id.no_crime_display);
+        mAddButton = (Button) view.findViewById(R.id.add_crime_button);
+
+        if (savedInstanceState != null) {
+          mSubtitleVisible = savedInstanceState.getBoolean(SAVED_SUBTITLE_VISIBLE);
         }
         updateUI();
         return view;
@@ -59,6 +73,7 @@ public class CrimeListFragment extends Fragment {
         public CrimeHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
+            //Initialize the elements when there is no crime display
             mTitleTextView = (TextView)itemView.findViewById(R.id.list_item_crime_title_text_view);
             mDateTextView = (TextView)itemView.findViewById(R.id.list_item_crime_date_text_view);
             mSolvedCheckBox = (CheckBox)itemView.findViewById(R.id.list_item_crime_solved_check_box);
@@ -129,9 +144,7 @@ public class CrimeListFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.menu_item_new_crime:
                 Crime crime = new Crime();
-                CrimeLab.get(getActivity()).addCrime(crime);
-                Intent intent = CrimePagerActivity.newIntent(getActivity(),crime.getID());
-                startActivity(intent);
+                addCrime(crime);
                 return true;
             case R.id.menu_item_show_subtitle:
                 mSubtitleVisible = !mSubtitleVisible;
@@ -143,11 +156,19 @@ public class CrimeListFragment extends Fragment {
 
         }
     }
+    /*Create an addCrime method to shorten the codes*/
+    private void addCrime(Crime mCrime) {
+        CrimeLab.get(getActivity()).addCrime(mCrime);
+        Intent intent = CrimePagerActivity.newIntent(getActivity(),mCrime.getID());
+        startActivity(intent);
+    }
 
     private void updateSubtitle() {
         CrimeLab crimeLab = CrimeLab.get(getActivity());
         int crimeCount = crimeLab.getCrimes().size();
-        String subtitle = getString(R.string.subtitle_format,crimeCount);
+        //Challenge 2: Plural String Resources
+        int crimeSize = crimeLab.getCrimes().size();
+        String subtitle = getResources().getQuantityString(R.plurals.subtitle_plural,crimeSize,crimeSize);
         if (!mSubtitleVisible) {
             subtitle = null;
         }
@@ -158,6 +179,19 @@ public class CrimeListFragment extends Fragment {
     private void updateUI() {
         CrimeLab crimeLab = CrimeLab.get(getActivity());
         List<Crime> crimes = crimeLab.getCrimes();
+        //Challenge 3: if there is no crime, display the message and add the addCrime button
+        if (crimes.isEmpty()) {
+            noCrimeView.setVisibility(View.VISIBLE);
+            mAddButton.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    Crime crime = new Crime();
+                    addCrime(crime);
+                }
+            });
+        }
+        else noCrimeView.setVisibility(View.INVISIBLE);
+
         if (mAdapter == null) {
             mAdapter = new CrimeAdapter(crimes);
             mCrimeRecycleView.setAdapter(mAdapter);
