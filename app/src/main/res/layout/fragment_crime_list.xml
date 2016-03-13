@@ -25,7 +25,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:id="@+id/no_crime_display"
-    tools:text="@string/no_crime_label"
+    android:text="@string/no_crime_label"
     android:layout_gravity="center"/>
 
 
@@ -33,7 +33,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:id="@+id/add_crime_button"
-    tools:text="@string/new_crime"
+    android:text="@string/new_crime"
     android:padding="15dp"
     android:layout_gravity="center"/>
 

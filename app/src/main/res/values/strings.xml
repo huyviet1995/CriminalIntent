@@ -16,5 +16,8 @@
         <item quantity="one">%1$s crime</item>
         <item quantity="other">%1$s crimes</item>
     </plurals>
+    <string name = "positive_button">OK</string>
+    <string name ="negative_button">CANCEL</string>
+    <string name="dialog_message">Are you sure you want to delete this ?</string>
 
 </resources>

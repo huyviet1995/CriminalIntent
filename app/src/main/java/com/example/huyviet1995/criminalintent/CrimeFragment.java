@@ -2,6 +2,8 @@ package com.example.huyviet1995.criminalintent;
 
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.RadialGradient;
 import android.os.Bundle;
@@ -34,9 +36,11 @@ public class CrimeFragment extends Fragment {
     private EditText mTitleField;
     private Button mDateButton;
     private CheckBox mSolvedCheckBox;
+    private boolean mIsChosen;
     private static String ARG_CRIME_ID = "crime_id";
     private static final String DIALOG_DATE = "DialogDate";
     private static final int REQUEST_DATE = 0;
+    private static final int REQUEST_MESSAGE = 1;
 
 
     public static CrimeFragment newInstance (UUID crimeId) {
@@ -118,14 +122,15 @@ public class CrimeFragment extends Fragment {
     public boolean onOptionsItemSelected (MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_item_delete:
-                CrimeLab.get(getActivity()).removeCrime(mCrime);
-                getActivity().finish();
-                return true;
+                FragmentManager fragmentManager = getFragmentManager();
+                DeleteMessageFragment deleteMessageFragment = new DeleteMessageFragment();
+                deleteMessageFragment.setTargetFragment(CrimeFragment.this, REQUEST_MESSAGE);
+                deleteMessageFragment.show(fragmentManager,"DELETE_MESSAGE");
+            return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -136,6 +141,14 @@ public class CrimeFragment extends Fragment {
             Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
             mCrime.setDate(date);
             updateDate();
+        }
+        if (requestCode == REQUEST_MESSAGE) {
+            mIsChosen = data.getBooleanExtra(DeleteMessageFragment.CHOICE,false);
+            if (mIsChosen) {
+                CrimeLab.get(getActivity()).removeCrime(mCrime);
+                getActivity().finish();
+            }
+
         }
     }
     private void updateDate() {
