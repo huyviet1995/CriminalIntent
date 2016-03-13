@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -60,7 +61,6 @@ public class CrimeFragment extends Fragment {
     }
 
 
-
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
@@ -93,10 +93,10 @@ public class CrimeFragment extends Fragment {
 
         mDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
-        public void onClick(View v) {
+            public void onClick(View v) {
                 FragmentManager manager = getFragmentManager();
                 DatePickerFragment dialog = DatePickerFragment.newInstance(mCrime.getDate());
-                dialog.setTargetFragment(CrimeFragment.this,REQUEST_DATE);
+                dialog.setTargetFragment(CrimeFragment.this, REQUEST_DATE);
                 dialog.show(manager, DIALOG_DATE);
             }
         });
@@ -118,19 +118,34 @@ public class CrimeFragment extends Fragment {
         inflater.inflate(R.menu.fragment_crime, menu);
     }
 
+
     @Override
     public boolean onOptionsItemSelected (MenuItem item) {
         switch (item.getItemId()) {
+
             case R.id.menu_item_delete:
                 FragmentManager fragmentManager = getFragmentManager();
                 DeleteMessageFragment deleteMessageFragment = new DeleteMessageFragment();
                 deleteMessageFragment.setTargetFragment(CrimeFragment.this, REQUEST_MESSAGE);
                 deleteMessageFragment.show(fragmentManager,"DELETE_MESSAGE");
             return true;
+            /*If the user press the up button when there is no title, a dialog will appear asking for a title*/
+            case android.R.id.home:
+                if (mTitleField.getText().toString().trim().isEmpty()) {
+                    FragmentManager fragmentManager1 = getFragmentManager();
+                    EmptyTitleNoticeFragment dialog = new EmptyTitleNoticeFragment();
+                    dialog.show(fragmentManager1, "EMPTY_TITLE");
+                    return true;
+                }
+
+
             default:
                 return super.onOptionsItemSelected(item);
         }
+
     }
+
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -154,5 +169,4 @@ public class CrimeFragment extends Fragment {
     private void updateDate() {
         mDateButton.setText(mCrime.getDate().toString());
     }
-
 }
