@@ -19,5 +19,6 @@
     <string name = "positive_button">OK</string>
     <string name ="negative_button">CANCEL</string>
     <string name="dialog_message">Are you sure you want to delete this ?</string>
+    <string name="empty_title_notice">Please enter a title !</string>
 
 </resources>

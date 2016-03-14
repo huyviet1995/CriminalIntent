@@ -109,7 +109,31 @@ public class CrimeFragment extends Fragment {
                 mCrime.setSolved(isChecked);
             }
         });
+
         return v;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getView().setFocusableInTouchMode(true);
+        getView().requestFocus();
+        getView().setOnKeyListener(new View.OnKeyListener() {
+
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
+                    if (mTitleField.getText().toString().trim().isEmpty()) {
+                        FragmentManager fragmentManager = getFragmentManager();
+                        EmptyTitleNoticeFragment dialog = new EmptyTitleNoticeFragment();
+                        dialog.show(fragmentManager, "EMPTY_TITLE");
+                        return true;
+                    }
+
+                }
+                return false;
+            }
+        });
     }
 
     @Override
@@ -138,14 +162,11 @@ public class CrimeFragment extends Fragment {
                     return true;
                 }
 
-
             default:
                 return super.onOptionsItemSelected(item);
         }
 
     }
-
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
