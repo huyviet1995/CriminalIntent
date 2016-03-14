@@ -11,6 +11,7 @@ import android.support.v4.app.DialogFragment;
 /**
  * Created by huyviet1995 on 3/12/16.
  */
+/*When user presses on the */
 public class DeleteMessageFragment extends DialogFragment {
     public static final String CHOICE = "choice";
     private boolean mIsChosen;

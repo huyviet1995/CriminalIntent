@@ -112,8 +112,8 @@ public class CrimeFragment extends Fragment {
 
         return v;
     }
-
     @Override
+    /*When there is no title, pressing the back button will trigger a dialog notice*/
     public void onResume() {
         super.onResume();
         getView().setFocusableInTouchMode(true);
@@ -124,9 +124,7 @@ public class CrimeFragment extends Fragment {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
                     if (mTitleField.getText().toString().trim().isEmpty()) {
-                        FragmentManager fragmentManager = getFragmentManager();
-                        EmptyTitleNoticeFragment dialog = new EmptyTitleNoticeFragment();
-                        dialog.show(fragmentManager, "EMPTY_TITLE");
+                        emptyTitleDialogShow();
                         return true;
                     }
 
@@ -139,6 +137,7 @@ public class CrimeFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+        /*Challenge 1: Inflate the new fragment_crime menu*/
         inflater.inflate(R.menu.fragment_crime, menu);
     }
 
@@ -146,7 +145,7 @@ public class CrimeFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected (MenuItem item) {
         switch (item.getItemId()) {
-
+            /*Extra Challenge: if user presses the delete button, a delete message will show up*/
             case R.id.menu_item_delete:
                 FragmentManager fragmentManager = getFragmentManager();
                 DeleteMessageFragment deleteMessageFragment = new DeleteMessageFragment();
@@ -156,9 +155,7 @@ public class CrimeFragment extends Fragment {
             /*If the user press the up button when there is no title, a dialog will appear asking for a title*/
             case android.R.id.home:
                 if (mTitleField.getText().toString().trim().isEmpty()) {
-                    FragmentManager fragmentManager1 = getFragmentManager();
-                    EmptyTitleNoticeFragment dialog = new EmptyTitleNoticeFragment();
-                    dialog.show(fragmentManager1, "EMPTY_TITLE");
+                    emptyTitleDialogShow();
                     return true;
                 }
 
@@ -166,6 +163,12 @@ public class CrimeFragment extends Fragment {
                 return super.onOptionsItemSelected(item);
         }
 
+    }
+
+    private void emptyTitleDialogShow() {
+        FragmentManager fragmentManager = getFragmentManager();
+        EmptyTitleNoticeFragment dialog = new EmptyTitleNoticeFragment();
+        dialog.show(fragmentManager, "EMPTY_TITLE");
     }
 
     @Override
@@ -178,13 +181,15 @@ public class CrimeFragment extends Fragment {
             mCrime.setDate(date);
             updateDate();
         }
+        /*Extra challenge: if mIsChosen is true (user presses okay) then finish the activity*/
         if (requestCode == REQUEST_MESSAGE) {
             mIsChosen = data.getBooleanExtra(DeleteMessageFragment.CHOICE,false);
             if (mIsChosen) {
+                /*Challenge 1: remove the crime from crime lab
+                * and finish the activity when the delete button is pressed*/
                 CrimeLab.get(getActivity()).removeCrime(mCrime);
                 getActivity().finish();
             }
-
         }
     }
     private void updateDate() {

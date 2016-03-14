@@ -85,7 +85,7 @@ public class CrimeListFragment extends Fragment {
             mTitleTextView.setText(mCrime.getTitle());
             mDateTextView.setText(mCrime.getDate().toString());
             mSolvedCheckBox.setChecked(mCrime.isSolved());
-            //set the boolean value of the
+            /*Challenge */
             mSolvedCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -173,7 +173,7 @@ public class CrimeListFragment extends Fragment {
     private void updateSubtitle() {
         CrimeLab crimeLab = CrimeLab.get(getActivity());
         int crimeCount = crimeLab.getCrimes().size();
-        //Challenge 2: Plural String Resources
+        /*Challenge 2:plural string resources*/
         int crimeSize = crimeLab.getCrimes().size();
         String subtitle = getResources().getQuantityString(R.plurals.subtitle_plural,crimeSize,crimeSize);
         if (!mSubtitleVisible) {
