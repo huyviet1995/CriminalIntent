@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.RadialGradient;
 import android.net.Uri;
@@ -12,6 +13,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.ShareCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
@@ -44,11 +46,16 @@ public class CrimeFragment extends Fragment {
     private boolean mIsChosen;
     private Button mReportButton;
     private Button mSuspectButton;
+    private Button mCallSuspect;
+    private boolean hasPhoneNumber;
+
+
     private static String ARG_CRIME_ID = "crime_id";
     private static final String DIALOG_DATE = "DialogDate";
     private static final int REQUEST_DATE = 0;
     private static final int REQUEST_MESSAGE = 1;
-    private static final int REQUEST_CONTACT =  1;
+    private static final int REQUEST_CONTACT =  2;
+    private static final int REQUEST_CALL = 3;
 
 
     public static CrimeFragment newInstance (UUID crimeId) {
@@ -126,12 +133,13 @@ public class CrimeFragment extends Fragment {
 
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(Intent.ACTION_SEND);
-                i.setType("text/plain");
-                i.putExtra(Intent.EXTRA_TEXT, getCrimeReport());
-                i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.crime_report_suspect));
-                i = Intent.createChooser(i, getString(R.string.send_report));
-                startActivity(i);
+        /*Challenge 15:ShareCompat*/
+                ShareCompat.IntentBuilder.from(getActivity())
+                        .setType("text/plain")
+                        .setText(getCrimeReport())
+                        .setSubject(getString(R.string.crime_report_suspect))
+                        .setChooserTitle(getString(R.string.send_report))
+                        .startChooser();
             }
         });
         final Intent pickContact = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
@@ -143,10 +151,25 @@ public class CrimeFragment extends Fragment {
                 startActivityForResult(pickContact,REQUEST_CONTACT);
             }
         });
-        if (mCrime.getSuspect() != null) {
+        if (mCrime.getSuspect()!=null) {
             mSuspectButton.setText(mCrime.getSuspect());
         }
+        mCallSuspect = (Button)v.findViewById(R.id.call_suspect);
+        mCallSuspect.setEnabled(false);
+        mCallSuspect.setOnClickListener(new View.OnClickListener(){
 
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Intent.ACTION_DIAL,ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
+                Uri number = Uri.parse("tel:"+mCrime.getPhone());
+                i.setData(number);
+                startActivity(i);
+            }
+        });
+        PackageManager packageManager = getActivity().getPackageManager();
+        if (packageManager.resolveActivity(pickContact,PackageManager.MATCH_DEFAULT_ONLY)==null) {
+            mSuspectButton.setEnabled(false);
+        }
         return v;
     }
 
@@ -203,6 +226,7 @@ public class CrimeFragment extends Fragment {
 
     }
 
+
     private void emptyTitleDialogShow() {
         FragmentManager fragmentManager = getFragmentManager();
         EmptyTitleNoticeFragment dialog = new EmptyTitleNoticeFragment();
@@ -232,17 +256,52 @@ public class CrimeFragment extends Fragment {
         else if (requestCode == REQUEST_CONTACT && data != null) {
             Uri contactURI = data.getData();
             String[] queryFields = new String[]{
-                    ContactsContract.Contacts.DISPLAY_NAME
-            };
-            Cursor c = getActivity().getContentResolver().query(contactURI, queryFields, null,null,null);
+                    ContactsContract.Contacts.DISPLAY_NAME /*ContactsContract.Contacts._ID, ContactsContract.Contacts.HAS_PHONE_NUMBER
+            */};
+            Cursor c = getActivity().getContentResolver().query(contactURI, queryFields, null, null, null);
             try {
                 if (c.getCount() == 0) {
+                    c.close();
                     return;
                 }
                 c.moveToFirst();
                 String suspect = c.getString(0);
                 mCrime.setSuspect(suspect);
                 mSuspectButton.setText(suspect);
+                /*get and set the suspect ID*/
+                //String suspectID = c.getString(1);
+                //mCrime.setSuspectID(suspectID);
+                /*check if the contact has the phonenumber*/
+                //if (Integer.parseInt(c.getString(2)) > 0) hasPhoneNumber = true;
+                //else hasPhoneNumber = false;
+                //mCallSuspect.setText(c.getString(2));
+                /*if the contact has phone number, then query the phone number*/
+                /*Challenge chapter 15: another implicit intent
+                * I have a problem here, I think I am doing it right but whenever it runs, it gives
+                * me security error and tells me to add permission
+                * I have added the permission in manifest file but to no avail. Please help me*/
+
+                /*if (hasPhoneNumber) {
+                    String[] phoneQuery = new String[]{
+                            ContactsContract.CommonDataKinds.Phone.NUMBER
+                    };
+                    Cursor phoneCursor = getActivity().getContentResolver().query(
+                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                            phoneQuery,
+                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = "+suspectID ,
+                            null,
+                            null);
+                    try {
+                        if (phoneCursor.getCount() == 0) return;
+                        phoneCursor.moveToFirst();
+                        String suspectPhoneNumber = phoneCursor.getString(0);
+                        mCallSuspect.setText(suspectPhoneNumber);
+                        mCallSuspect.setEnabled(true);
+                    }
+                    finally {
+                        phoneCursor.close();
+                    }
+                }*/
             } finally {
                 c.close();
             }
@@ -272,5 +331,6 @@ public class CrimeFragment extends Fragment {
         }
         String report = getString(R.string.crime_report,mCrime.getTitle(),dateString,solvedString,suspect);
         return report;
+
     }
 }

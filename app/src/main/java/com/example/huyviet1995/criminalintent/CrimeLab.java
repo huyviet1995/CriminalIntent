@@ -29,11 +29,11 @@ public class CrimeLab {
         ContentValues values = getContentValues(c);
         mDatabase.insert(CrimeTable.NAME, null, values);
     }
-    //Challenge chapter 14
+    /*Challenge chapter 14: delete crime*/
     public void deleteCrime(Crime c) {
         String uuidString = c.getID().toString();
         ContentValues values = getContentValues(c);
-        mDatabase.delete(CrimeTable.NAME,CrimeTable.Cols.UUID, null);
+        mDatabase.delete(CrimeTable.NAME,CrimeTable.Cols.UUID+" = ? ", new String[]{uuidString});
     }
 
     private CrimeLab (Context context) {
@@ -85,6 +85,8 @@ public class CrimeLab {
         values.put(CrimeTable.Cols.DATE, crime.getDate().getTime());
         values.put(CrimeTable.Cols.SOLVED, crime.isSolved() ? 1 : 0);
         values.put(CrimeTable.Cols.SUSPECT,crime.getSuspect());
+        values.put(CrimeTable.Cols.PHONE, crime.getPhone());
+        values.put(CrimeTable.Cols.SUSPECTID, crime.getSuspectID());
         return values;
     }
     private CrimeCursorWrapper queryCrimes (String whereClause, String[]  whereArgs) {
