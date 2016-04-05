@@ -2,6 +2,7 @@ package com.example.huyviet1995.criminalintent;
 
 import android.text.format.DateFormat;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -74,6 +75,7 @@ public class Crime {
     public void setPhone(String phone) {
         mSuspectPhone = phone;
     }
-
-    
+    public String getPhotoFileName() {
+        return "IMG_"+getID().toString()+".jpg";
+    }
 }
