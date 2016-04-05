@@ -212,7 +212,7 @@ public class CrimeFragment extends Fragment {
 
             @Override
             public void onClick(View v) {
-                if (mPhotoView != null || mPhotoFile.exists()) {
+                if (mPhotoView != null && mPhotoFile.exists()) {
                     FragmentManager fragmentManager = getFragmentManager();
                     ZoomImageDialog zoomImageDialog = ZoomImageDialog.newInstance(mPhotoFile);
                     zoomImageDialog.show(fragmentManager, DIALOG_ZOOM);
@@ -392,10 +392,6 @@ public class CrimeFragment extends Fragment {
             mPhotoView.setImageDrawable(null);
             Log.d("CREATION", "There is no photo available");
 
-        }
-        else if (mPhotoView == null) {
-            bitmap = PictureUtils.getScaledBitmap(mPhotoFile.getPath(),getActivity());
-            mPhotoView.setImageBitmap(bitmap);
         }
         else {
             bitmap = PictureUtils.getScaledBitMap(mPhotoFile.getPath(),mPhotoView.getWidth(),mPhotoView.getHeight());

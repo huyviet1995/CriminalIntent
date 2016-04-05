@@ -27,7 +27,7 @@ public class ZoomImageDialog extends DialogFragment {
         fragment.setArguments(args);
         return fragment;
     }
-    public Dialog OnCreateDialog(Bundle savedInstanceState) {
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
         mPhotoFile = (File) getArguments().getSerializable(ARGS_ZOOM);
 
         View v = LayoutInflater.from(getActivity()).inflate(R.layout.zoom_image_view, null);
@@ -37,6 +37,7 @@ public class ZoomImageDialog extends DialogFragment {
         return new AlertDialog.Builder(getActivity())
                 .setView(v)
                 .setTitle("Zoom Image")
+                .setNegativeButton(R.string.negative_button,null)
                 .create();
     }
 
